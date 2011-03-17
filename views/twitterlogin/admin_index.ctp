@@ -34,15 +34,59 @@
 						'label' => __('API Key',true),
 				        'type'  => 'text',
 				        //'class' => 'required',
-				        'value' => $twitterlogin['twitterlogin']['api_key']
+				        'style' => 'width:75%;',
+				        'value' => $twitterlogin['Twitterlogin']['api_key']
 				));
 
 		echo $form->input('Twitterlogin.consumer_key', array(
 				        'label' => __('Consumer Key',true),
 				        'type'  => 'text',
-				        'value' => $twitterlogin['twitterlogin']['consumer_key']
+				        'style' => 'width:75%;',
+				        'value' => $twitterlogin['Twitterlogin']['consumer_key']
 				));
-
+				
+		echo $form->input('Twitterlogin.consumer_secret', array(
+				        'label' => __('Consumer Secret',true),
+				        'type'  => 'text',
+				        'style' => 'width:75%;',
+				        'value' => $twitterlogin['Twitterlogin']['consumer_secret']
+				));
+				
+		echo $form->input('Twitterlogin.request_token_url', array(
+				        'label' => __('Request Token URL',true),
+				        'type'  => 'text',
+				        'style' => 'width:75%;',
+				        'value' => ($twitterlogin['Twitterlogin']['request_token_url'])? $twitterlogin['Twitterlogin']['request_token_url']: 'https://api.twitter.com/oauth/request_token',
+				));
+				
+		echo $form->input('Twitterlogin.access_token_url', array(
+				        'label' => __('Access Token URL',true),
+				        'type'  => 'text',
+				        'style' => 'width:75%;',
+				        'value' => ($twitterlogin['Twitterlogin']['access_token_url'])? $twitterlogin['Twitterlogin']['access_token_url']: 'https://api.twitter.com/oauth/access_token',
+				));
+				
+		echo $form->input('Twitterlogin.authorize_url', array(
+				        'label' => __('Authorize URL',true),
+				        'type'  => 'text',
+				        'style' => 'width:75%;',
+				        'value' => ($twitterlogin['Twitterlogin']['authorize_url'])? $twitterlogin['Twitterlogin']['authorize_url']: 'https://api.twitter.com/oauth/authorize',
+				));
+				
+		echo $form->input('Twitterlogin.twitter_username', array(
+				        'label' => __('Your Twitter Username',true),
+				        'type'  => 'text',
+				        'style' => 'width:75%;',
+				        'value' => $twitterlogin['Twitterlogin']['twitter_username']
+				));
+				
+		echo $form->input('Twitterlogin.twitter_password', array(
+				        'label' => __('Your Twitter Password',true),
+				        'type'  => 'password',
+				        'style' => 'width:75%;',
+				        'value' => $twitterlogin['Twitterlogin']['twitter_password']
+				));
+				
 		?>
     <?php echo $form->submit('Update');?>
     <?php echo $form->end();?>
