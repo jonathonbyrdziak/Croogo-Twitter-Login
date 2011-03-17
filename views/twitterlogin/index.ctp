@@ -1,4 +1,19 @@
-<div class="example">
+<?php 
+/**
+ * 5Twenty Studios
+ * Twitter Login
+ *
+ * This plugin is designed to make it possible for your users to login through twitter.
+ * We aplogize, but this is an unsupported plugin. Feel free to contribute.
+ *
+ * @package Twitter Login
+ * @subpackage Croogo
+ * @author   Jonathon Byrd <support@5twentystudios.com>
+ * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link     http://www.5twentystudios.com
+ * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
+ */
+?><div class="Twitterlogin">
     <h2><?php echo $title_for_layout; ?></h2>
     <p><?php __('content here'); ?></p>
 </div>

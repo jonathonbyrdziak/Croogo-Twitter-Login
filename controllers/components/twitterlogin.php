@@ -1,17 +1,19 @@
 <?php
 /**
- * Example Component
+ * 5Twenty Studios
+ * Twitter Login
  *
- * An example hook component for demonstrating hook system.
+ * This plugin is designed to make it possible for your users to login through twitter.
+ * We aplogize, but this is an unsupported plugin. Feel free to contribute.
  *
- * @category Component
- * @package  Croogo
- * @version  1.0
- * @author   Fahad Ibnay Heylaal <contact@fahad19.com>
+ * @package Twitter Login
+ * @subpackage Croogo
+ * @author   Jonathon Byrd <support@5twentystudios.com>
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link     http://www.croogo.org
+ * @link     http://www.5twentystudios.com
+ * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-class ExampleComponent extends Object {
+class TwitterloginComponent extends Object {
 /**
  * Called after the Controller::beforeFilter() and before the controller action
  *
@@ -19,7 +21,7 @@ class ExampleComponent extends Object {
  * @return void
  */
     public function startup(&$controller) {
-        $controller->set('exampleComponent', 'ExampleComponent startup');
+        $controller->set('twitterloginComponent', 'TwitterloginComponent startup');
     }
 /**
  * Called after the Controller::beforeRender(), after the view class is loaded, and before the

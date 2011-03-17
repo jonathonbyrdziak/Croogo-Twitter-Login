@@ -1,24 +1,26 @@
 <?php
 /**
- * Example Controller
+ * 5Twenty Studios
+ * Twitter Login
  *
- * PHP version 5
+ * This plugin is designed to make it possible for your users to login through twitter.
+ * We aplogize, but this is an unsupported plugin. Feel free to contribute.
  *
- * @category Controller
- * @package  Croogo
- * @version  1.0
- * @author   Fahad Ibnay Heylaal <contact@fahad19.com>
+ * @package Twitter Login
+ * @subpackage Croogo
+ * @author   Jonathon Byrd <support@5twentystudios.com>
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link     http://www.croogo.org
+ * @link     http://www.5twentystudios.com
+ * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-class ExampleController extends ExampleAppController {
+class TwitterloginController extends TwitterloginAppController {
 /**
  * Controller name
  *
  * @var string
  * @access public
  */
-    public $name = 'Example';
+    public $name = 'Twitterlogin';
 /**
  * Models used by the Controller
  *
@@ -28,12 +30,12 @@ class ExampleController extends ExampleAppController {
     public $uses = array('Setting');
 
     public function admin_index() {
-        $this->set('title_for_layout', __('Example', true));
+        $this->set('title_for_layout', __('Twitterlogin', true));
     }
 
     public function index() {
-        $this->set('title_for_layout', __('Example', true));
-        $this->set('exampleVariable', 'value here');
+        $this->set('title_for_layout', __('Twitterlogin', true));
+        $this->set('twitterloginVariable', 'value here');
     }
 
 }

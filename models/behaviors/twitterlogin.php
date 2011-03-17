@@ -1,16 +1,19 @@
 <?php
 /**
- * Example Behavior
+ * 5Twenty Studios
+ * Twitter Login
  *
- * PHP version 5
+ * This plugin is designed to make it possible for your users to login through twitter.
+ * We aplogize, but this is an unsupported plugin. Feel free to contribute.
  *
- * @category Behavior
- * @package  Croogo
- * @author   Fahad Ibnay Heylaal <contact@fahad19.com>
+ * @package Twitter Login
+ * @subpackage Croogo
+ * @author   Jonathon Byrd <support@5twentystudios.com>
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link     http://www.croogo.org
+ * @link     http://www.5twentystudios.com
+ * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-class ExampleBehavior extends ModelBehavior {
+class TwitterloginBehavior extends ModelBehavior {
 /**
  * Setup
  *
@@ -37,12 +40,12 @@ class ExampleBehavior extends ModelBehavior {
         if ($primary && isset($results[0][$model->alias])) {
             foreach ($results AS $i => $result) {
                 if (isset($results[$i][$model->alias]['body'])) {
-                    $results[$i][$model->alias]['body'] .= '<p>[Modified by ExampleBehavior]</p>';
+                    $results[$i][$model->alias]['body'] .= '<p>[Modified by TwitterloginBehavior]</p>';
                 }
             }
         } elseif (isset($results[$model->alias])) {
             if (isset($results[$model->alias]['body'])) {
-                $results[$model->alias]['body'] .= '<p>[Modified by ExampleBehavior]</p>';
+                $results[$model->alias]['body'] .= '<p>[Modified by TwitterloginBehavior]</p>';
             }
         }
 

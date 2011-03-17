@@ -4,15 +4,16 @@
  * Twitter Login
  *
  * This plugin is designed to make it possible for your users to login through twitter.
- * We aplogize, but this is an unsupported plugin. Please notify us if you have
+ * We aplogize, but this is an unsupported plugin. Feel free to contribute.
  *
- * @package 
+ * @package Twitter Login
  * @subpackage Croogo
- * @author   Fahad Ibnay Heylaal <contact@fahad19.com>
+ * @author   Jonathon Byrd <support@5twentystudios.com>
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link     http://www.croogo.org
+ * @link     http://www.5twentystudios.com
+ * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-class ExampleActivation {
+class TwitterloginActivation {
 /**
  * onActivate will be called if this returns true
  *
@@ -30,11 +31,11 @@ class ExampleActivation {
  */
     public function onActivation(&$controller) {
         // ACL: set ACOs with permissions
-        $controller->Croogo->addAco('Example'); // ExampleController
-        $controller->Croogo->addAco('Example/admin_index'); // ExampleController::admin_index()
-        $controller->Croogo->addAco('Example/index', array('registered', 'public')); // ExampleController::index()
+        $controller->Croogo->addAco('Twitterlogin'); // TwitterloginController
+        $controller->Croogo->addAco('Twitterlogin/admin_index'); // TwitterloginController::admin_index()
+        $controller->Croogo->addAco('Twitterlogin/index', array('registered', 'public')); // TwitterloginController::index()
 
-        // Main menu: add an Example link
+        // Main menu: add an Twitterlogin link
         $mainMenu = $controller->Link->Menu->findByAlias('main');
         $controller->Link->Behaviors->attach('Tree', array(
             'scope' => array(
@@ -43,8 +44,8 @@ class ExampleActivation {
         ));
         $controller->Link->save(array(
             'menu_id' => $mainMenu['Menu']['id'],
-            'title' => 'Example',
-            'link' => 'plugin:example/controller:example/action:index',
+            'title' => 'Twitterlogin',
+            'link' => 'plugin:twitterlogin/controller:twitterlogin/action:index',
             'status' => 1,
         ));
     }
@@ -65,13 +66,13 @@ class ExampleActivation {
  */
     public function onDeactivation(&$controller) {
         // ACL: remove ACOs with permissions
-        $controller->Croogo->removeAco('Example'); // ExampleController ACO and it's actions will be removed
+        $controller->Croogo->removeAco('Twitterlogin'); // TwitterloginController ACO and it's actions will be removed
 
-        // Main menu: delete Example link
+        // Main menu: delete Twitterlogin link
         $link = $controller->Link->find('first', array(
             'conditions' => array(
                 'Menu.alias' => 'main',
-                'Link.link' => 'plugin:example/controller:example/action:index',
+                'Link.link' => 'plugin:twitterlogin/controller:twitterlogin/action:index',
             ),
         ));
         $controller->Link->Behaviors->attach('Tree', array(

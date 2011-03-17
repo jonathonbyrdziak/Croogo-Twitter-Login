@@ -1,17 +1,19 @@
 <?php
 /**
- * Example Helper
+ * 5Twenty Studios
+ * Twitter Login
  *
- * An example hook helper for demonstrating hook system.
+ * This plugin is designed to make it possible for your users to login through twitter.
+ * We aplogize, but this is an unsupported plugin. Feel free to contribute.
  *
- * @category Helper
- * @package  Croogo
- * @version  1.0
- * @author   Fahad Ibnay Heylaal <contact@fahad19.com>
+ * @package Twitter Login
+ * @subpackage Croogo
+ * @author   Jonathon Byrd <support@5twentystudios.com>
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
- * @link     http://www.croogo.org
+ * @link     http://www.5twentystudios.com
+ * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-class ExampleHelper extends AppHelper {
+class TwitterloginHelper extends AppHelper {
 /**
  * Other helpers used by this helper
  *
@@ -58,7 +60,7 @@ class ExampleHelper extends AppHelper {
  */
     public function afterSetNode() {
         // field values can be changed from hooks
-        $this->Layout->setNodeField('title', $this->Layout->node('title') . ' [Modified by ExampleHelper]');
+        $this->Layout->setNodeField('title', $this->Layout->node('title') . ' [Modified by TwitterloginHelper]');
     }
 /**
  * Called before LayoutHelper::nodeInfo()
