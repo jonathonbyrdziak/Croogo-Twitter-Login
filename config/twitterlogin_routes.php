@@ -13,5 +13,5 @@
  * @link     http://www.5twentystudios.com
  * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-CroogoRouter::connect('/twitter/login', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'index'));
-?>
+
+CroogoRouter::connect('/twitterlogin/callback', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'callback'));

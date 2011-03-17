@@ -13,7 +13,5 @@
  * @link     http://www.5twentystudios.com
  * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-?><a href="#"><?php __('Twitterlogin'); ?></a>
-<ul>
-    <li><?php echo $html->link(__('Settings', true), array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'index')); ?></li>
-</ul>
+
+//specifically left empty

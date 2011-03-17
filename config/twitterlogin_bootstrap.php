@@ -17,40 +17,40 @@
 /**
  * Routes
  *
- * example_routes.php will be loaded in main app/config/routes.php file.
+ * twitterlogin_routes.php will be loaded in main app/config/routes.php file.
  */
-    Croogo::hookRoutes('Example');
+    Croogo::hookRoutes('Twitterlogin');
 /**
  * Behavior
  *
  * This plugin's Example behavior will be attached whenever Node model is loaded.
  */
-    Croogo::hookBehavior('Node', 'Example.Example', array());
+    //Croogo::hookBehavior('Node', 'Example.Example', array());
 /**
  * Component
  *
  * This plugin's Example component will be loaded in ALL controllers.
  */
-    Croogo::hookComponent('*', 'Example.Example');
+    Croogo::hookComponent('*', 'Twitterlogin.Twitterlogin');
 /**
  * Helper
  *
- * This plugin's Example helper will be loaded via NodesController.
+ * This plugin's Twitterlogin helper will be loaded via UsersController.
  */
-    Croogo::hookHelper('Nodes', 'Example.Example');
+    //Croogo::hookHelper('Users', 'Twitterlogin.Twitterlogin');
 /**
  * Admin menu (navigation)
  *
  * This plugin's admin_menu element will be rendered in admin panel under Extensions menu.
  */
-    Croogo::hookAdminMenu('Example');
+    Croogo::hookAdminMenu('Twitterlogin');
 /**
  * Admin row action
  *
  * When browsing the content list in admin panel (Content > List),
  * an extra link called 'Example' will be placed under 'Actions' column.
  */
-    Croogo::hookAdminRowAction('Nodes/admin_index', 'Example', 'plugin:example/controller:example/action:index/:id');
+    //Croogo::hookAdminRowAction('Twitterlogin/admin_index', 'Twitter Login', 'plugin:twitterlogin/controller:twitterlogin/action:index/:id');
 /**
  * Admin tab
  *
@@ -59,6 +59,6 @@
  *
  * Useful for adding form extra form fields if necessary.
  */
-    Croogo::hookAdminTab('Nodes/admin_add', 'Example', 'example.admin_tab_node');
-    Croogo::hookAdminTab('Nodes/admin_edit', 'Example', 'example.admin_tab_node');
+    //Croogo::hookAdminTab('Nodes/admin_add', 'Example', 'example.admin_tab_node');
+    //Croogo::hookAdminTab('Nodes/admin_edit', 'Example', 'example.admin_tab_node');
 ?>

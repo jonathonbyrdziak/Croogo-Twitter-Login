@@ -27,9 +27,16 @@ class TwitterloginController extends TwitterloginAppController {
  * @var array
  * @access public
  */
-    public $uses = array('Setting');
+    public $uses = array('twitterlogin');
 
     public function admin_index() {
+    	 $twitterlogin = $this->twitterlogin->findById(1);
+
+        if(!$twitterlogin){
+        	//$this->Session->setFlash(__("We couldn't load your previous settings from the database", true), 'default', array('class' => 'error'));
+        }
+
+        $this->set(compact('twitterlogin'));
         $this->set('title_for_layout', __('Twitterlogin', true));
     }
 
@@ -37,6 +44,34 @@ class TwitterloginController extends TwitterloginAppController {
         $this->set('title_for_layout', __('Twitterlogin', true));
         $this->set('twitterloginVariable', 'value here');
     }
-
+	
+    /**
+     * Twitter calls this back
+     * 
+     * @link http://www.swagaways.com/twitterlogin/callback
+     */
+    public function callback()
+    {
+    	
+    }
+    
+	/**
+	 * Updating the administrative values
+	 * 
+	 * @return null
+	 */
+    public function admin_update()
+    {
+    	if( !$this->twitterlogin->save( $this->data ) )
+		{
+    		$this->Session->setFlash(__('Something went wrong, we couldnt save to your db.', true), 'default', array('class' => 'error'));
+    	}
+    	else
+    	{
+    		$this->Session->setFlash(__('Your Twitter settings were successfully saved.', true), 'default', array('class' => 'success'));
+    	}
+    	
+		$this->redirect( Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'index')) );
+    }
 }
 ?>

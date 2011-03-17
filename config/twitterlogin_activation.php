@@ -31,10 +31,12 @@ class TwitterloginActivation {
  */
     public function onActivation(&$controller) {
         // ACL: set ACOs with permissions
-        $controller->Croogo->addAco('Twitterlogin'); // TwitterloginController
+        $controller->Croogo->addAco('Twitterlogin');
         $controller->Croogo->addAco('Twitterlogin/admin_index'); // TwitterloginController::admin_index()
+        $controller->Croogo->addAco('Twitterlogin/admin_update');
+        $controller->Croogo->addAco('Twitterlogin/callback', array('registered', 'public')); // TwitterloginController::index()
         $controller->Croogo->addAco('Twitterlogin/index', array('registered', 'public')); // TwitterloginController::index()
-
+        
         // Main menu: add an Twitterlogin link
         $mainMenu = $controller->Link->Menu->findByAlias('main');
         $controller->Link->Behaviors->attach('Tree', array(
@@ -48,6 +50,9 @@ class TwitterloginActivation {
             'link' => 'plugin:twitterlogin/controller:twitterlogin/action:index',
             'status' => 1,
         ));
+        
+        //Don't forget to run our other installation procedures!
+        $this->createDatabaseSchemas($controller);
     }
 /**
  * onDeactivate will be called if this returns true
@@ -82,6 +87,35 @@ class TwitterloginActivation {
         ));
         if (isset($link['Link']['id'])) {
             $controller->Link->delete($link['Link']['id']);
+        }
+    }
+/**
+ * Create the database scheme for our twitter login model
+ *
+ * @param unknown_type $controller
+ */
+    public function createDatabaseSchemas(&$controller)
+    {
+		App::Import('CakeSchema');
+        $CakeSchema = new CakeSchema();
+        $db =& ConnectionManager::getDataSource('default');
+
+        $schema_files = array(
+            'twitterlogins.php'
+        );
+        
+        foreach($schema_files as $schema_file) {
+        	$class_name = Inflector::camelize(substr($schema_file, 0, -4)).'Schema';
+        	$table_name = substr($schema_file, 0, -4);
+
+        	if(!in_array($table_name, $db->_sources)) {
+        		require_once dirname(__file__).DS.'schema'.DS.$schema_file;
+	        	$ActivateSchema = new $class_name;
+	        	$created = false;
+				if(isset($ActivateSchema->tables[$table_name])) {
+					$db->execute($db->createSchema($ActivateSchema, $table_name));
+				}
+			}
         }
     }
 }
