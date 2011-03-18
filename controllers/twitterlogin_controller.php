@@ -87,7 +87,12 @@ class TwitterloginController extends TwitterloginAppController
 	 *
 	 * @var unknown_type
 	 */
-	public $components = array('Security','Twitterlogin.Abraham','Session');
+	public $components = array(
+		'Security',
+		'Twitterlogin.Abraham',
+		'Session',
+		'Auth',
+	);
     
 	/**
 	 * Models used by the Controller
@@ -95,7 +100,32 @@ class TwitterloginController extends TwitterloginAppController
 	 * @var array
 	 * @access public
 	 */
-	public $uses = array('Twitterlogin','User','Twprofile');
+	public $uses = array(
+		'Twitterlogin',
+		'User',
+		'Twprofile',
+	);
+    
+	/**
+	 * Models used by the Controller
+	 *
+	 * @var array
+	 * @access public
+	 */
+	public $helpers = array(
+        'Html',
+		'Twitterlogin.Twitterlogin',
+	);
+	
+	/**
+	 * Successful login redirect page
+	 * 
+	 * This is the default page that the user will be redirected to upon a 
+	 * successful transaction. This is given to Router::url() as a parameter
+	 *
+	 * @var string
+	 */
+	public $loginRedirect = '/';
 	
     /**
      * Before filter callback,
@@ -218,11 +248,11 @@ class TwitterloginController extends TwitterloginAppController
      */
     public function callback( $type = 'twitter' )
     {
-    	//loading resources
+    	// loading resources
     	global $twConfigs;
 		
 		// If the oauth_token is old redirect to the connect page.
-		if ($this->Session->read('Twitter.oauth_token') !== $this->params['url']['oauth_token'])
+		if ( $this->Session->read('Twitter.oauth_token') !== $this->params['url']['oauth_token'] )
 		{
 			$this->Session->write('Twitter.oauth_status', 'oldtoken');
 			$this->Session->destroy();
@@ -239,36 +269,21 @@ class TwitterloginController extends TwitterloginAppController
 		// Request access tokens from twitter
 		$access_token = $this->Abraham->getAccessToken($this->params['url']['oauth_verifier']);
 		
-		// Save the access tokens. Normally these would be saved in a database for future use.
-		$this->Session->write('access_token', $access_token);
-		
-		$data = array();
-		$data['Twprofile'] = array();
-		$data['Twprofile']['twitter_id'] = $access_token['user_id'];
-		$data['Twprofile']['oauth_token'] = $access_token['oauth_token'];
-		$data['Twprofile']['oauth_token_secret'] = $access_token['oauth_token_secret'];
-		$data['Twprofile']['username'] = $access_token['screen_name'];
-		
-		$this->Twprofile->create( );
-		if ( $this->Twprofile->save( $data ) )
+		// Something failed, we dont have any tokens
+		if ( empty($access_token['oauth_token']) && empty($access_token['oauth_token_secret']) )
 		{
-			$this->Session->write('Twitter.id', $this->Twprofile->id);
+			// Save HTTP status for error dialog on connnect page.
+			$this->Session->write('Twitter.oauth_status', 'oldtoken');
+			$this->Session->destroy();
+			
+			$this->Session->setFlash(__('Sorry, we didnt receive any Twitter tokens.', true), 'default', array('class' => 'error'));
+			$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
+		    header("Location: " . $loginPage);
+		    exit();
 		}
-		
-		// Remove no longer needed request tokens 
-		$this->Session->delete('Twitter.oauth_token');
-		$this->Session->delete('Twitter.oauth_token_secret');
 		
 		// If HTTP response is 200 continue otherwise send to connect page to retry
-		if (200 == $this->Abraham->http_code)
-		{
-			// The user has been verified and the access tokens can be saved for future use
-			$this->Session->write('Twitter.oauth_status', 'verified');
-			
-			$lastStep = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'laststep'), true);
-		    header("Location: " . $lastStep);
-		}
-		else
+		if ( 200 != $this->Abraham->http_code )
 		{
 			// Save HTTP status for error dialog on connnect page.
 			$this->Session->write('Twitter.oauth_status', 'oldtoken');
@@ -277,7 +292,89 @@ class TwitterloginController extends TwitterloginAppController
 			$this->Session->setFlash(__('Sorry, we had to clear your cache. Please try again.', true), 'default', array('class' => 'error'));
 			$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
 		    header("Location: " . $loginPage);
+		    exit();
 		}
+		
+		$Twprofile = $this->Twprofile->find('first',
+					array('conditions'=> 
+						array('Twprofile.oauth_token' => $access_token['oauth_token'],
+						'Twprofile.oauth_token_secret' => $access_token['oauth_token_secret'])
+						));
+		
+		// If the twitter connect information does not exist
+		if (!$Twprofile) 
+		{
+			// Save the twitter connect details 
+			$Twprofile = array();
+			$Twprofile['Twprofile'] = array();
+			$Twprofile['Twprofile']['twitter_id'] = $access_token['user_id'];
+			$Twprofile['Twprofile']['oauth_token'] = $access_token['oauth_token'];
+			$Twprofile['Twprofile']['oauth_token_secret'] = $access_token['oauth_token_secret'];
+			$Twprofile['Twprofile']['username'] = $access_token['screen_name'];
+			
+			$this->Twprofile->create( );
+			if ( ! $this->Twprofile->save( $Twprofile ) )
+			{
+				$this->Session->setFlash(__('Saving to the database failed. Please try again.', true), 'default', array('class' => 'error'));
+				$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
+			    header("Location: " . $loginPage);
+			    exit();
+			}
+		}
+		
+		// Remove no longer needed request tokens 
+		$this->Session->delete('Twitter.oauth_token');
+		$this->Session->delete('Twitter.oauth_token_secret');
+		
+		$this->Session->write('Twitter.id', $Twprofile['Twprofile']['twitter_id']);
+		$this->Session->write('Twitter.oauth_status', 'verified');
+		
+		// The account is not connected to croogo
+		if ( empty($Twprofile['Twprofile']['croogo_id']) )
+		{
+			$auth = $this->Session->read('Auth');
+			if ($auth['User']['id']) // user is logged in, so automatically merge accounts
+			{
+				$Twprofile['Twprofile']['croogo_id'] = $auth['User']['id'];
+				$this->Twprofile->save( $Twprofile );
+				
+				// ALL DONE!
+				$this->Session->setFlash(__('Logged In!', true), 'default', array('class' => 'success'));
+				$homePage = Router::url($this->loginRedirect, true);
+				header("Location: " . $homePage);
+				exit();
+			}
+			
+			// user needs to merge accounts
+			$lastStep = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'laststep'), true);
+			header("Location: " . $lastStep);
+			exit();
+		}
+		
+		// authenticate the user
+		$User = $this->User->find('first',
+					array('conditions'=> 
+						array('User.id' => $Twprofile['Twprofile']['croogo_id'])
+						));
+		
+		// We couldn't find the user
+		if (!$User)
+		{
+			$lastStep = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'laststep'), true);
+			header("Location: " . $lastStep);
+			exit();
+		}
+		
+		//and this is an authenticated, logged in, happy user
+		$this->Auth->fields = array('username' => 'id', 'password' => 'email'); 
+		$this->Auth->autoRedirect = false; 
+		$this->Auth->user( $User['User']['id'] );
+		$this->Auth->login( $User['User'] );
+		
+		
+		$this->Session->setFlash(__('Logged In!', true), 'default', array('class' => 'success'));
+		$homePage = Router::url($this->loginRedirect, true);
+		header("Location: " . $homePage);
 		exit();
     }
 	
@@ -294,9 +391,122 @@ class TwitterloginController extends TwitterloginAppController
 	 */
 	public function laststep()
 	{
-		if ( isset($this->data['Twitterlogin']['email']) )
+		// initializing view variables
+		if ( $this->Session->read('Twitter.id') )
 		{
-			echo 'test';
+			$this->set('twitter_id', $this->Session->read('Twitter.id'));
+		}
+		elseif ( isset($this->data['Twitterlogin']['twitter_id']) )
+		{
+			$this->Session->write('Twitter.id', $this->data['Twitterlogin']['twitter_id']);
+			$this->set('twitter_id', $this->data['Twitterlogin']['twitter_id']);
+		}
+		
+		
+		// if the user is connecting their email
+		if ( isset($this->data['Twitterlogin']['email']) && !empty($this->data['Twitterlogin']['email']) )
+		{
+			$Twprofile = $this->Twprofile->find('first',
+					array('conditions'=> 
+						array('Twprofile.twitter_id' => $this->data['Twitterlogin']['twitter_id'])
+						));
+				
+			if (!$Twprofile) //For some reason we couldnt find their twitter information, so they need to start over
+			{
+				$this->Session->setFlash(__('We lost your twitter tokens, please try again.', true), 'default', array('class' => 'error'));
+				$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
+			    header("Location: " . $loginPage);
+			    exit();
+			}
+			
+			$userEmailExists = $this->User->find('first',
+					array('conditions'=> 
+						array('User.email' => $this->data['Twitterlogin']['email'])
+						));
+			
+			//user doesn't exist, so create one
+			if ( !$userEmailExists )
+			{
+				$User = array();
+				$User['User'] = array();
+				$User['User']['username'] = $Twprofile['Twprofile']['username'];
+				$User['User']['name'] = $Twprofile['Twprofile']['username'];
+				$User['User']['email'] = $this->data['Twitterlogin']['email'];
+				$User['User']['password'] = $Twprofile['Twprofile']['oauth_token'];
+				$User['User']['status'] = 1;
+				// @TODO need to let the administrator decide what the default role is to be.
+				$User['User']['role_id'] = 2;
+				
+				$this->User->create();
+				if ( $this->User->save( $User ) )
+				{
+					$User['User']['id'] = $Twprofile['Twprofile']['croogo_id'] = $this->User->id;
+					$this->Twprofile->save( $Twprofile );
+					
+					//and this is an authenticated, logged in, happy user
+					$this->Auth->fields = array('username' => 'id', 'password' => 'email'); 
+					$this->Auth->autoRedirect = false; 
+					$this->Auth->user( $User['User']['id'] );
+					$this->Auth->login( $User['User'] );
+					
+					$this->Session->setFlash(__('All Done! You can now communicate with Twitter.', true), 'default', array('class' => 'success'));
+					$homePage = Router::url($this->loginRedirect, true);
+				    header("Location: " . $homePage);
+				    exit();
+				}
+				
+				// error saving the user
+				$this->Session->setFlash(__('Error creating your account. Please try again.', true), 'default', array('class' => 'error'));
+				$lastStep = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'laststep'), true);
+				header("Location: " . $lastStep);
+				exit();
+			}
+			else // the user DOES exist so tell them to log in
+			{
+				$this->Session->setFlash(__('That email is already used. Please login if you want to use that email.', true), 'default', array('class' => 'error'));
+			}
+		}
+		
+		
+		// if the user is connecting their email
+		elseif ( isset($this->data['Twitterlogin']['username']) && isset($this->data['Twitterlogin']['username']) )
+		{
+			// setting up the authentication
+			$this->Auth->autoRedirect = false; 
+			$this->Auth->fields = array('username' => 'username', 'password' => 'password'); 
+			$this->data['Twitterlogin']['password'] = $this->Auth->password($this->data['Twitterlogin']['password']);
+			
+			if ( ! $authorized = $this->Auth->login( $this->data['Twitterlogin'] ) )
+			{
+				// failed to login, retry
+				$this->Session->setFlash(__('Authorization Failed. Please try again.', true), 'default', array('class' => 'error'));
+				$lastStep = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'laststep'), true);
+				header("Location: " . $lastStep);
+				exit();
+			}
+			
+			$Twprofile = $this->Twprofile->find('first',
+					array('conditions'=> 
+						array('Twprofile.twitter_id' => $this->data['Twitterlogin']['twitter_id'])
+						));
+				
+			if (!$Twprofile) //For some reason we couldnt find their twitter information, so they need to start over
+			{
+				$this->Session->setFlash(__('We lost your twitter tokens, please try again.', true), 'default', array('class' => 'error'));
+				$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
+			    header("Location: " . $loginPage);
+			    exit();
+			}
+			
+			$auth = $this->Session->read('Auth');
+			$Twprofile['Twprofile']['croogo_id'] = $auth['User']['id'];
+			$this->Twprofile->save( $Twprofile );
+			
+			// successfully connected
+			$this->Session->setFlash(__('All Done! You can now communicate with Twitter.', true), 'default', array('class' => 'success'));
+			$homePage = Router::url($this->loginRedirect, true);
+			header("Location: " . $homePage);
+			exit();
 		}
 	}
     
