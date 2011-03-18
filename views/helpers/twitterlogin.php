@@ -68,7 +68,7 @@ class TwitterloginHelper extends AppHelper {
  * @return string
  */
     public function beforeNodeInfo() {
-        return '<p>beforeNodeInfo</p>';
+        //return '<p>beforeNodeInfo</p>';
     }
 /**
  * Called after LayoutHelper::nodeInfo()
@@ -76,7 +76,7 @@ class TwitterloginHelper extends AppHelper {
  * @return string
  */
     public function afterNodeInfo() {
-        return '<p>afterNodeInfo</p>';
+        //return '<p>afterNodeInfo</p>';
     }
 /**
  * Called before LayoutHelper::nodeBody()
@@ -84,7 +84,7 @@ class TwitterloginHelper extends AppHelper {
  * @return string
  */
     public function beforeNodeBody() {
-        return '<p>beforeNodeBody</p>';
+        //return '<p>beforeNodeBody</p>';
     }
 /**
  * Called after LayoutHelper::nodeBody()
@@ -92,7 +92,7 @@ class TwitterloginHelper extends AppHelper {
  * @return string
  */
     public function afterNodeBody() {
-        return '<p>afterNodeBody</p>';
+        //return '<p>afterNodeBody</p>';
     }
 /**
  * Called before LayoutHelper::nodeMoreInfo()
@@ -100,7 +100,7 @@ class TwitterloginHelper extends AppHelper {
  * @return string
  */
     public function beforeNodeMoreInfo() {
-        return '<p>beforeNodeMoreInfo</p>';
+        //return '<p>beforeNodeMoreInfo</p>';
     }
 /**
  * Called after LayoutHelper::nodeMoreInfo()
@@ -108,7 +108,27 @@ class TwitterloginHelper extends AppHelper {
  * @return string
  */
     public function afterNodeMoreInfo() {
-        return '<p>afterNodeMoreInfo</p>';
+        //return '<p>afterNodeMoreInfo</p>';
     }
 }
-?>
+
+/**
+ * Template code for including the twitter login button into the theme
+ *
+ * @param boolean $display_if_logged_in
+ * @return html|string
+ */
+function twitter_login_button( $display_if_logged_in = false )
+{
+	// The same as require('controllers/users_controller.php');
+	App::import('Helper', 'Html');
+	$html = new HtmlHelper;
+	
+	$html->css('/twitterlogin/css/style.css', 'stylesheet', array('inline' => false));
+	
+	echo "<a href='".
+	Router::url(array('admin' => false, 'plugin' => null, 'controller' => 'twitterlogin', 'action' => 'authorize'), true)
+	."'><div class='twitter-login-lighter'></div></a>";
+	
+}
+

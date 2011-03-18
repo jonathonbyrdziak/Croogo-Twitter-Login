@@ -13,6 +13,22 @@
  * @link     http://www.5twentystudios.com
  * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
+class TwprofileBehavior extends ModelBehavior {
+/**
+ * Setup
+ *
+ * @param object $model
+ * @param array  $config
+ * @return void
+ */
+    public function setup(&$model, $config = array()) {
+        if (is_string($config)) {
+            $config = array($config);
+        }
 
-CroogoRouter::connect('/twitterlogin/callback', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'callback'));
-CroogoRouter::connect('/twitterlogin/authorize', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'authorize'));
+        $this->settings[$model->alias] = $config;
+    }
+    
+	
+}
+?>

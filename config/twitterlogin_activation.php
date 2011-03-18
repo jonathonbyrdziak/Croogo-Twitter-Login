@@ -35,6 +35,7 @@ class TwitterloginActivation {
         $controller->Croogo->addAco('Twitterlogin/admin_index'); // TwitterloginController::admin_index()
         $controller->Croogo->addAco('Twitterlogin/admin_update');
         $controller->Croogo->addAco('Twitterlogin/callback', array('registered', 'public')); // TwitterloginController::index()
+        $controller->Croogo->addAco('Twitterlogin/authorize', array('registered', 'public')); // TwitterloginController::index()
         $controller->Croogo->addAco('Twitterlogin/index', array('registered', 'public')); // TwitterloginController::index()
         
         // Main menu: add an Twitterlogin link
@@ -101,7 +102,8 @@ class TwitterloginActivation {
         $db =& ConnectionManager::getDataSource('default');
 
         $schema_files = array(
-            'twitterlogins.php'
+            'twitterlogins.php',
+        	'twprofiles.php'
         );
         
         foreach($schema_files as $schema_file) {
