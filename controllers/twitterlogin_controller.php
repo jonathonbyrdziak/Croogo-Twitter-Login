@@ -119,8 +119,7 @@ class TwitterloginController extends TwitterloginAppController
 		$this->Twprofile->create( );
 		if ( $this->Twprofile->save( $data ) )
 		{
-			$data['Twprofile']['id'] = $this->Model->id;
-			$this->Session->write('Twitter.id', $data['Twprofile']['id']);
+			$this->Session->write('Twitter.id', $this->Twprofile->id);
 		}
 		
 		// Remove no longer needed request tokens 
@@ -133,10 +132,8 @@ class TwitterloginController extends TwitterloginAppController
 			// The user has been verified and the access tokens can be saved for future use
 			$this->Session->write('Twitter.oauth_status', 'verified');
 			
-			$this->Session->setFlash(__('You are now logged in with twitter!', true), 'default', array('class' => 'success'));
-		    $homePage = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'laststep'), true);
-		    //header("Location: " . $homePage);
-		    echo 'DONE';
+			$lastStep = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'laststep'), true);
+		    header("Location: " . $lastStep);
 		}
 		else
 		{
@@ -147,7 +144,6 @@ class TwitterloginController extends TwitterloginAppController
 			$this->Session->setFlash(__('Sorry, we had to clear your cache. Please try again.', true), 'default', array('class' => 'error'));
 			$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
 		    header("Location: " . $loginPage);
-		    
 		}
 		exit();
     }
@@ -174,12 +170,14 @@ class TwitterloginController extends TwitterloginAppController
 		$this->Session->write("Twitter.oauth_token_secret", $request_token['oauth_token_secret']);
 		
 		// If last connection failed don't display authorization link.
-		switch ($this->Abraham->http_code) {
+		switch ($this->Abraham->http_code)
+		{
 		  case 200:
 		    // Build authorize URL and redirect user to Twitter.
 		    $url = $this->Abraham->getAuthorizeURL( $request_token['oauth_token'] );
-		    header('Location: ' . $url); 
+		    header("Location: " . $url); 
 		    break;
+		    
 		  default:
 		    // Show notification if something went wrong.
 		  	$this->Session->setFlash(__('Something went wrong, we couldnt connect to twitter.', true), 'default', array('class' => 'error'));
@@ -215,6 +213,7 @@ class TwitterloginController extends TwitterloginAppController
     	{
     		$this->Session->setFlash(__('Your Twitter settings were successfully saved.', true), 'default', array('class' => 'success'));
     	}
+    	
     	$url = Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'admin_index'), true);
 		header( "Location: " . $url );
 		exit();

@@ -36,6 +36,7 @@ class TwitterloginActivation {
         $controller->Croogo->addAco('Twitterlogin/admin_update');
         $controller->Croogo->addAco('Twitterlogin/callback', array('registered', 'public')); // TwitterloginController::index()
         $controller->Croogo->addAco('Twitterlogin/authorize', array('registered', 'public')); // TwitterloginController::index()
+        $controller->Croogo->addAco('Twitterlogin/laststep', array('registered', 'public')); // TwitterloginController::index()
         $controller->Croogo->addAco('Twitterlogin/index', array('registered', 'public')); // TwitterloginController::index()
         
         // Main menu: add an Twitterlogin link

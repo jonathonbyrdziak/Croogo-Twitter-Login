@@ -16,3 +16,4 @@
 
 CroogoRouter::connect('/twitterlogin/callback', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'callback'));
 CroogoRouter::connect('/twitterlogin/authorize', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'authorize'));
+CroogoRouter::connect('/twitterlogin/laststep', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'laststep'));
