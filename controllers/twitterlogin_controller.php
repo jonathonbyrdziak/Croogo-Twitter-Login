@@ -142,6 +142,8 @@ class TwitterloginController extends TwitterloginAppController
         parent::beforeFilter();
         $this->Security->validatePost = false;
         
+        if ($this->Session->read("Twitter.redirect")) 
+        	$this->loginRedirect = $this->Session->read("Twitter.redirect");
     }
 
 	/**
@@ -530,9 +532,9 @@ class TwitterloginController extends TwitterloginAppController
      */
     public function admin_index()
     {
-    	$twitter = twitter_connection();
-    	$content = $twitter->getProfile();
-    	print_r($content);
+    	//$twitter = twitter_connection();
+    	//$content = $twitter->getProfile();
+    	//print_r($content);
     	
     	
     	$twitterlogin = $this->Twitterlogin->findById(1);

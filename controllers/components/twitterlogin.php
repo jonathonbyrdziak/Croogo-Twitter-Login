@@ -23,7 +23,6 @@ class TwitterloginComponent extends Object
 	 */
     public function startup(&$controller)
     {
-		global $Abraham;
 		$controller->set('twitterloginComponent', 'TwitterloginComponent startup');
 	    
 		App::import('Component', 'Abraham');
@@ -60,13 +59,49 @@ class TwitterloginComponent extends Object
 }
 
 /**
+ * Returns the current url
+ *
+ * @return unknown
+ */
+function twitter_redirect_url()
+{
+	$pageURL = 'http';
+	if (@$_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+	$pageURL .= "://";
+	
+	if ($_SERVER["SERVER_PORT"] != "80") {
+		$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+	} else {
+		$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+	}
+	//$url = urlencode($pageURL);
+	
+	//initializing variables
+	App::import('Helper', 'Session');
+	$Session = new SessionComponent;
+	$Session->write("Twitter.redirect", $pageURL);
+}
+
+/**
  * Template code for including the twitter login button into the theme
  *
  * @param boolean $display_if_logged_in
  * @return html|string
  */
-function twitter_login_button( $display_if_logged_in = false )
+function twitter_login_button( $display_if_logged_in = true )
 {
+	//initializing variables
+	App::import('Helper', 'Session');
+	$Session = new SessionComponent;
+	$auth = $Session->read('Auth');
+	
+	//reasons to fail
+	if (twitter_connected()) return false;
+	if (!$display_if_logged_in && isset($auth['User']['id'])) return false;
+	
+	//remember the last url the user saw
+	twitter_redirect_url();
+	
 	// The same as require('controllers/users_controller.php');
 	App::import('Helper', 'Html');
 	$html = new HtmlHelper;

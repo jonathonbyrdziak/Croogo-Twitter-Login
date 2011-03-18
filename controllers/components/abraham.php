@@ -121,7 +121,7 @@ class AbrahamComponent extends Object
 	function __construct()
 	{
 		// loading resources
-    	global $twConfigs;
+    	global $twConfigs, $Abraham;
     	App::import('Model', 'Twitterlogin.Twitterlogin');
     	App::import('Model', 'Twitterlogin.Twprofile');
     	App::import('Component', 'Session');
@@ -148,7 +148,7 @@ class AbrahamComponent extends Object
     	$this->admin_twitter_password = $twConfigs['twitter_password'];
     	
     	$auth = $Session->read('Auth');
-		if ($auth['User']['id']) // user is logged in, so automatically load accounts
+		if ( isset($auth['User']['id']) ) // user is logged in, so automatically load accounts
 		{
 			$profile = $Twprofile->find('first',
 					array('conditions'=> 
@@ -169,7 +169,34 @@ class AbrahamComponent extends Object
 			}
 		}
 		
+		// setting this as a global variable
+		$Abraham = $this;
+		
     	return $twConfigs;
+	}
+	
+	/**
+	 * get the auth token from this class
+	 *
+	 * @return unknown
+	 */
+	function getAuthToken( $token = false )
+	{
+		if (!isset($this->oauth_token)) return $token;
+		if (is_null($this->oauth_token)) return $token;
+		return $this->oauth_token;
+	}
+	
+	/**
+	 * get the auth token secret from this class
+	 *
+	 * @return unknown
+	 */
+	function getAuthTokenSecret( $token = false )
+	{
+		if (!isset($this->oauth_token_secret)) return $token;
+		if (is_null($this->oauth_token_secret)) return $token;
+		return $this->oauth_token_secret;
 	}
 	
 	/**
@@ -181,13 +208,13 @@ class AbrahamComponent extends Object
 	function initialize($oauth_token = NULL, $oauth_token_secret = NULL)
 	{
 		// initializing variables
-		if (is_null($oauth_token) && !is_null($this->oauth_token))
+		if (is_null($oauth_token) && $this->getAuthToken())
 		{
-			$oauth_token = $this->oauth_token;
+			$oauth_token = $this->getAuthToken();
 		}
-		if (is_null($oauth_token_secret) && !is_null($this->oauth_token_secret))
+		if (is_null($oauth_token_secret) && $this->getAuthTokenSecret())
 		{
-			$oauth_token_secret = $this->oauth_token_secret;
+			$oauth_token_secret = $this->getAuthTokenSecret();
 		}
 		
 		// reasons to return 
