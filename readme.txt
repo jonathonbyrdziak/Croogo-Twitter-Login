@@ -2,13 +2,7 @@ Installation
 --------------------------------------------------
 After activation head to the Plugins >> Twitter Login >> Settings page and follow the steps to register your application.
 Once you've registered your application you need to save it in the settings area.
-Finally there are some html helpers that you'll need to include in your template, so open your components/users_controller.php and include the following lines in your UserController
-
-    public $helpers = array(
-    	'Twitterlogin.Twitterlogin'
-    );
-    
-Obviously you cannot declare the $helpers member twice, so make sure you merge this with your current code properly.
+Multiple template codes are available to you, here's the list
 
 Template Codes
 --------------------------------------------------

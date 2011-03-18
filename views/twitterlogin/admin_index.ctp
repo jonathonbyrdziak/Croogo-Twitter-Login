@@ -51,7 +51,7 @@
 				        'style' => 'width:75%;',
 				        'value' => $twitterlogin['Twitterlogin']['consumer_secret']
 				));
-				
+		
 		echo $form->input('Twitterlogin.request_token_url', array(
 				        'label' => __('Request Token URL',true),
 				        'type'  => 'text',
@@ -86,7 +86,7 @@
 				        'style' => 'width:75%;',
 				        'value' => $twitterlogin['Twitterlogin']['twitter_password']
 				));
-				
+		
 		?>
     <?php echo $form->submit('Update');?>
     <?php echo $form->end();?>

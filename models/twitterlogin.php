@@ -13,7 +13,7 @@
  * @link     http://www.5twentystudios.com
  * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-class TwitterloginBehavior extends ModelBehavior {
+class Twitterlogin extends TwitterloginAppModel {
 /**
  * Setup
  *

@@ -111,24 +111,4 @@ class TwitterloginHelper extends AppHelper {
         //return '<p>afterNodeMoreInfo</p>';
     }
 }
-
-/**
- * Template code for including the twitter login button into the theme
- *
- * @param boolean $display_if_logged_in
- * @return html|string
- */
-function twitter_login_button( $display_if_logged_in = false )
-{
-	// The same as require('controllers/users_controller.php');
-	App::import('Helper', 'Html');
-	$html = new HtmlHelper;
-	
-	$html->css('/twitterlogin/css/style.css', 'stylesheet', array('inline' => false));
-	
-	echo "<a href='".
-	Router::url(array('admin' => false, 'plugin' => null, 'controller' => 'twitterlogin', 'action' => 'authorize'), true)
-	."'><div class='twitter-login-lighter'></div></a>";
-	
-}
-
+?>

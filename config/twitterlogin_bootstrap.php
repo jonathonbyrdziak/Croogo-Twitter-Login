@@ -61,4 +61,5 @@
  */
     //Croogo::hookAdminTab('Nodes/admin_add', 'Example', 'example.admin_tab_node');
     //Croogo::hookAdminTab('Nodes/admin_edit', 'Example', 'example.admin_tab_node');
+    
 ?>

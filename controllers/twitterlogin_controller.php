@@ -37,6 +37,10 @@
  * by cakephp and then adjusting the configurations file for sessions to be saved to
  * the database. I like this better anyway.
  * 
+ * 401 error on requesting auth_token.
+ * I wasn't sending all of the variables to the auth_token url, therefore I was receiving
+ * a 401 error.
+ * 
  * 
  * GET THE CODE
  * ====================
@@ -138,11 +142,6 @@ class TwitterloginController extends TwitterloginAppController
         parent::beforeFilter();
         $this->Security->validatePost = false;
         
-        //loading resources
-    	global $twConfigs;
-    	$twConfigs = $this->Twitterlogin->findById(1);
-    	$twConfigs = $twConfigs['Twitterlogin'];
-    	
     }
 
 	/**
@@ -182,11 +181,8 @@ class TwitterloginController extends TwitterloginAppController
 	 */
 	function authorize( $type = 'twitter' )
 	{
-		//loading resources
-    	global $twConfigs;
-    	
 		// Build TwitterOAuth object with client credentials.
-		$this->Abraham->initialize($twConfigs['consumer_key'], $twConfigs['consumer_secret']);
+		$this->Abraham->initialize();
 		
 		// Get temporary credentials.
 		//send callback url as parameter, or leave false to use the registered APP callback
@@ -248,10 +244,7 @@ class TwitterloginController extends TwitterloginAppController
      */
     public function callback( $type = 'twitter' )
     {
-    	// loading resources
-    	global $twConfigs;
-		
-		// If the oauth_token is old redirect to the connect page.
+    	// If the oauth_token is old redirect to the connect page.
 		if ( $this->Session->read('Twitter.oauth_token') !== $this->params['url']['oauth_token'] )
 		{
 			$this->Session->write('Twitter.oauth_status', 'oldtoken');
@@ -264,7 +257,7 @@ class TwitterloginController extends TwitterloginAppController
 		}
 		
 		// Create TwitteroAuth object with app key/secret and token key/secret from default phase
-		$this->Abraham->initialize($twConfigs['consumer_key'], $twConfigs['consumer_secret'], $this->Session->read('Twitter.oauth_token'), $this->Session->read('Twitter.oauth_token_secret'));
+		$this->Abraham->initialize($this->Session->read('Twitter.oauth_token'), $this->Session->read('Twitter.oauth_token_secret'));
 		
 		// Request access tokens from twitter
 		$access_token = $this->Abraham->getAccessToken($this->params['url']['oauth_verifier']);
@@ -537,6 +530,11 @@ class TwitterloginController extends TwitterloginAppController
      */
     public function admin_index()
     {
+    	$twitter = twitter_connection();
+    	$content = $twitter->getProfile();
+    	print_r($content);
+    	
+    	
     	$twitterlogin = $this->Twitterlogin->findById(1);
 		$this->set(compact('twitterlogin'));
         $this->set('title_for_layout', __('Twitterlogin', true));
