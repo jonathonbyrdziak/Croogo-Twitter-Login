@@ -144,12 +144,6 @@ class TwitterloginController extends TwitterloginAppController
         
         if ($this->Session->read("Twitter.redirect")) 
         {
-        	$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
-        	if ($loginPage == $this->Session->read("Twitter.redirect")) return false;
-        	
-        	$loginPage = Router::url(array('admin' => true, 'controller' => 'users', 'action' => 'login'), true);
-        	if ($loginPage == $this->Session->read("Twitter.redirect")) return false;
-        	
         	$this->loginRedirect = $this->Session->read("Twitter.redirect");
         }
     }

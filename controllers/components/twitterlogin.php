@@ -74,13 +74,24 @@ function twitter_redirect_url()
 	} else {
 		$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 	}
-	//$url = urlencode($pageURL);
 	
 	//initializing variables
 	App::import('Helper', 'Session');
 	$Session = new SessionComponent;
-	$Session->write("Twitter.redirect", $pageURL);
+	$pageURL = Router::url($pageURL, true);
+	
+	//$url = urlencode($pageURL);
+	$loginPage = Router::url(array('admin' => false, 'plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
+	if ($loginPage == $pageURL) return false;
+	
+	$loginPage = Router::url(array('admin' => true, 'controller' => 'users', 'action' => 'login'), true);
+	if ($loginPage == $pageURL) return false;
+	
+	//$Session->write("Twitter.redirect", $pageURL);
 }
+
+//remember the last url the user saw
+twitter_redirect_url();
 
 /**
  * Template code for including the twitter login button into the theme
@@ -98,9 +109,6 @@ function twitter_login_button( $display_if_logged_in = true )
 	//reasons to fail
 	if (twitter_connected()) return false;
 	if (!$display_if_logged_in && isset($auth['User']['id'])) return false;
-	
-	//remember the last url the user saw
-	twitter_redirect_url();
 	
 	// The same as require('controllers/users_controller.php');
 	App::import('Helper', 'Html');
