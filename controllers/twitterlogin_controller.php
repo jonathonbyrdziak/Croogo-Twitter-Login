@@ -532,11 +532,6 @@ class TwitterloginController extends TwitterloginAppController
      */
     public function admin_index()
     {
-    	//$twitter = twitter_connection();
-    	//$content = $twitter->getProfile();
-    	//print_r($content);
-    	
-    	
     	$twitterlogin = $this->Twitterlogin->findById(1);
 		$this->set(compact('twitterlogin'));
         $this->set('title_for_layout', __('Twitterlogin', true));

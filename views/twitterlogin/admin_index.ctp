@@ -13,7 +13,12 @@
  * @link	 http://www.5twentystudios.com
  * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  */
-?><div class="Twitterlogin index">
+
+//including stylesheets
+$html->css('/twitterlogin/css/style.css', 'stylesheet', array('inline' => false));
+
+?>
+<div class="twitteradmin index">
 	<h2><?php echo $title_for_layout; ?></h2>
 	<p><?php __('Creating a twitter login is not too difficult. I will try my best to alleviate the pain with this plugin, but I do not guarantee that this is going to go smoothly for you.'); ?></p>
 	<br/>
@@ -24,12 +29,109 @@
 	<br/>
 	
 	<?php 
-	if (!twitter_connected() && $twitterlogin['Twitterlogin']['consumer_key'] && $twitterlogin['Twitterlogin']['consumer_secret'])
-	{
+	if (!twitter_connected() && $twitterlogin['Twitterlogin']['consumer_key'] && $twitterlogin['Twitterlogin']['consumer_secret']):
 		__('<p>Test it out. Merge your account!</p>'); 
 		twitter_login_button();
-	}
-	?>
+	
+	elseif (twitter()): 
+		$twitter = twitter();
+		?>
+		<h2>You're successfully connected to Twitter, LIVE!</h2>
+		<p><?php __("I've made this as simple as I can figure for most people. If you want the entire object back, simply use the following code. Otherwise use the examples below."); ?></p>
+		<code>
+			$twitter = twitter();
+		</code>
+		<p><?php __("You can ask twitter for any of the following data:"); ?></p>
+		
+		<table style="width:100%">
+			<tr>
+				<td width="200px">Twitter ID:</td>
+				<td><?php twitter('profile.id'); ?></td>
+				<td>twitter('profile.id');</td>
+			</tr>
+			<tr>
+				<td width="200px">Name:</td>
+				<td><?php twitter('profile.name'); ?></td>
+				<td>twitter('profile.name');</td>
+			</tr>
+			<tr>
+				<td width="200px">Username:</td>
+				<td><?php twitter('profile.screen_name'); ?></td>
+				<td>twitter('profile.screen_name');</td>
+			</tr>
+			<tr>
+				<td width="200px">Description:</td>
+				<td><?php twitter('profile.description'); ?></td>
+				<td>twitter('profile.description');</td>
+			</tr>
+			<tr>
+				<td width="200px">Website:</td>
+				<td><?php twitter('profile.url'); ?></td>
+				<td>twitter('profile.url');</td>
+			</tr>
+			<tr>
+				<td width="200px">Location:</td>
+				<td><?php twitter('profile.location'); ?></td>
+				<td>twitter('profile.location');</td>
+			</tr>
+			<tr>
+				<td width="200px">Time Zone:</td>
+				<td><?php twitter('profile.time_zone'); ?></td>
+				<td>twitter('profile.time_zone');</td>
+			</tr>
+			
+			
+			<tr>
+				<td width="200px">Tweets:</td>
+				<td><?php twitter('profile.statuses_count'); ?></td>
+				<td>twitter('profile.statuses_count');</td>
+			</tr>
+			<tr>
+				<td width="200px">Friends:</td>
+				<td><?php twitter('profile.friends_count'); ?></td>
+				<td>twitter('profile.friends_count');</td>
+			</tr>
+			<tr>
+				<td width="200px">Following Requests:</td>
+				<td><?php twitter('profile.follow_request_sent'); ?></td>
+				<td style="white-space:nowrap;">twitter('profile.follow_request_sent');</td>
+			</tr>
+			<tr>
+				<td width="200px">Favourites Count:</td>
+				<td><?php twitter('profile.favourites_count'); ?></td>
+				<td>twitter('profile.favourites_count');</td>
+			</tr>
+			<tr>
+				<td width="200px">Followers:</td>
+				<td><?php twitter('profile.followers_count'); ?></td>
+				<td>twitter('profile.followers_count');</td>
+			</tr>
+			
+			
+			<tr>
+				<td width="200px">Current Status:</td>
+				<td><?php twitter('status.text'); ?></td>
+				<td>twitter('status.text');</td>
+			</tr>
+			<tr>
+				<td width="200px">Status ID:</td>
+				<td><?php twitter('status.id'); ?></td>
+				<td>twitter('status.id');</td>
+			</tr>
+			<tr>
+				<td width="200px">Source:</td>
+				<td><?php twitter('status.source'); ?></td>
+				<td>twitter('status.source');</td>
+			</tr>
+			<tr>
+				<td width="200px">Date:</td>
+				<td><?php twitter('status.created_at'); ?></td>
+				<td>twitter('status.created_at');</td>
+			</tr>
+			
+		</table>
+	<?php endif; ?>
+	
 	
 	<?php echo $form->create(null, array('url' => array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'update'))); ?>
 		<?php

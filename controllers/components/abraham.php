@@ -114,6 +114,117 @@ class AbrahamComponent extends Object
 	public $authorized = false;
 	
 	/**
+	 * Function returns the users basic profile data
+	 * 
+	 * $twitter = twitter();
+	 * echo $twitter->get('profile.source');
+	 * 
+	 * @return unknown
+	 */
+	public function get( $variable = null )
+	{
+		//reasons to fail
+		if ( is_null($variable) ) return false;
+		if ( !$this->authorized ) return false;
+		
+		//initializing variables
+		static $data;
+		
+		if (!isset($data))
+		{
+			$data = array();
+		}
+		
+		if (!isset($data[$variable]))
+		{
+			@list($switch, $property) = explode('.', $variable);
+			switch ($switch)
+			{
+				case 'profile':
+					if ( ! $tmp = $this->request('account/verify_credentials') ) return false;
+					if ( is_null($property) ) { echo '<pre>'; print_r($tmp); echo '</pre>'; }
+					if ( !isset($tmp->$property) ) return false;
+					$data[$variable] = $tmp->$property;
+					break;
+					
+				case 'status':
+					if ( ! $tmp = $this->request('account/verify_credentials') ) return false;
+					if ( is_null($property) ) { echo '<pre>'; print_r($tmp); echo '</pre>'; }
+					if ( !isset($tmp->status->$property) ) return false;
+					$data[$variable] =  $tmp->status->$property;
+					break;
+			}
+			
+		}
+		
+		if ( !isset($data[$variable]) ) return false;
+		return $data[$variable];
+	}
+
+	/**
+	 * returns last status
+	 *
+	 * $twitter = twitter();
+	 * echo $twitter->status()->source;
+	 * 
+	 * @return unknown
+	 */
+	public function status()
+	{
+		static $data;
+		
+		if (!isset($data) || !$data)
+		{
+			$this->profile();
+		}
+		
+		return $data;
+	}
+
+	/**
+	 * GET wrapper for oAuthRequest.
+	 *
+	 * @param unknown_type $url
+	 * @param unknown_type $parameters
+	 * @return unknown
+	 */
+	function request($url, $parameters = array())
+	{
+		static $urls;
+		
+		if ( !isset($urls) )
+		{
+			$urls = array();
+		}
+		
+		if ( !isset($urls[$url]) )
+		{
+			$urls[$url] = $this->oAuthRequest($url, 'GET', $parameters);
+			if ($this->format === 'json' && $this->decode_json)
+			{
+				$urls[$url] = json_decode($urls[$url]);
+			}
+		}
+		
+		return $urls[$url];
+	}
+	
+	/**
+	 * POST wrapper for oAuthRequest.
+	 *
+	 * @param unknown_type $url
+	 * @param unknown_type $parameters
+	 * @return unknown
+	 */
+	function post($url, $parameters = array()) {
+		$response = $this->oAuthRequest($url, 'POST', $parameters);
+		if ($this->format === 'json' && $this->decode_json) {
+			return json_decode($response);
+		}
+		return $response;
+	}
+	
+	/**
 	 * Constructor.
 	 * 
 	 * AbrahamComponent / TwitterOAuth object
@@ -241,19 +352,6 @@ class AbrahamComponent extends Object
 	}
 	
 	/**
-	 * Function returns the users basic profile data
-	 *
-	 * @return unknown
-	 */
-	public function getProfile()
-	{
-		if ( ! $this->authorized ) return false;
-		if ( ! $data = $this->get('account/verify_credentials') ) return false;
-		return $data;
-	}
-	
-	
-	/**
 	 * Set API URLS
 	 */
 	function accessTokenURL()
@@ -350,36 +448,6 @@ class AbrahamComponent extends Object
 		$token = OAuthUtil::parse_parameters($request);
 		$this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
 		return $token;
-	}
-
-	/**
-	 * GET wrapper for oAuthRequest.
-	 *
-	 * @param unknown_type $url
-	 * @param unknown_type $parameters
-	 * @return unknown
-	 */
-	function get($url, $parameters = array()) {
-		$response = $this->oAuthRequest($url, 'GET', $parameters);
-		if ($this->format === 'json' && $this->decode_json) {
-			return json_decode($response);
-		}
-		return $response;
-	}
-	
-	/**
-	 * POST wrapper for oAuthRequest.
-	 *
-	 * @param unknown_type $url
-	 * @param unknown_type $parameters
-	 * @return unknown
-	 */
-	function post($url, $parameters = array()) {
-		$response = $this->oAuthRequest($url, 'POST', $parameters);
-		if ($this->format === 'json' && $this->decode_json) {
-			return json_decode($response);
-		}
-		return $response;
 	}
 
 	/**

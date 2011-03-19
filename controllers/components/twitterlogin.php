@@ -117,15 +117,26 @@ function twitter_login_button( $display_if_logged_in = true )
 /**
  * Function will return a global reference twitter object
  *
- * @return object
+ * @param unknown_type $variable
+ * @param unknown_type $user_id
+ * @param unknown_type $echo
+ * @return unknown
  */
-function &twitter_connection()
+function &twitter( $variable = null, $user_id = null, $echo = true )
 {
 	// initializing variables
 	global $Abraham;
 	
 	// reasons to fail
 	if (!isset($Abraham) || !$Abraham) return false;
+	
+	if ( !is_null($variable) )
+	{
+		if ($echo)
+			echo $Abraham->get($variable);
+		else
+			return $Abraham->get($variable);
+	}
 	
     return $Abraham;
 }

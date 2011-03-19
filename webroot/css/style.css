@@ -1,12 +1,16 @@
 /**
- * Twitter login classes
+ * Twitter login button
  */
 .twitter-login-darker {background:url('../img/darker.png') 0 0 no-repeat;width:151px;height:24px;}
 .twitter-login-lighter {background:url('../img/lighter.png') 0 0 no-repeat;width:151px;height:24px;}
 
+/**
+ * Last Step View
+ */
 .twitterlogin {margin:30px 0;}
 	.twitterlogin h2 {padding:5px;}
 	.twitterlogin p {padding:5px;}
+	
 	.twitterlogin-or {width:90%;text-align:center;height:30px;margin:20px 0 -30px;}
 	.twitterlogin-left, .twitterlogin-right {position:relative;float:left;width:49%;padding:0 0 0 20px;margin-right:-20px;}
 		.twitterlogin-left h2, .twitterlogin-right h2, .twitterlogin-or h2 {margin:0px;padding: 0 0 10px;} 
@@ -15,6 +19,10 @@
 	.twitterlogin .clearfix {display:block;width:100%;clear:both;}
 	.twitterlogin .submit {width:100px;position:relative;float:right;}
 
+/**
+ * Administrative settings
+ */
+.twitteradmin code {display:block;padding:10px;margin:10px;background:#ccc;border:1px solid #ddd;}
 
 
 
