@@ -15,6 +15,20 @@
  */
 
 /**
+ * DEBUGGING
+ * 
+ * A must have for every application in the world.
+ */
+	defined('TWITTERLOGIN_DEBUG') or define('TWITTERLOGIN_DEBUG', false);
+
+/**
+ * The administrators IP address
+ * 
+ * Only this user can view the debugging
+ */
+	defined('TWITTERLOGIN_ADMINIP') or define('TWITTERLOGIN_ADMINIP', '71.231.37.59');
+	
+/**
  * Routes
  *
  * twitterlogin_routes.php will be loaded in main app/config/routes.php file.
@@ -37,7 +51,7 @@
  *
  * This plugin's Twitterlogin helper will be loaded via UsersController.
  */
-    //Croogo::hookHelper('Users', 'Twitterlogin.Twitterlogin');
+    Croogo::hookHelper('*', 'Twitterlogin.Twitterlogin');
 /**
  * Admin menu (navigation)
  *

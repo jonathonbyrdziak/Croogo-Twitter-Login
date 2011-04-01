@@ -17,3 +17,6 @@
 CroogoRouter::connect('/twitterlogin/callback', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'callback'));
 CroogoRouter::connect('/twitterlogin/authorize', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'authorize'));
 CroogoRouter::connect('/twitterlogin/laststep', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'laststep'));
+CroogoRouter::connect('/twitterlogin/tweetit', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'tweetit'));
+CroogoRouter::connect('/twitterlogin/favorite', array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'favorite'));
+//CroogoRouter::connect('admin/twitterlogin/update', array('admin' => true, 'plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'update'));

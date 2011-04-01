@@ -14,7 +14,6 @@
  * @repository https://github.com/Jonathonbyrd/Croogo-Twitter-Login
  * 
  */
-
 /**
  * Twitter login Controller
  * 
@@ -25,6 +24,11 @@
  * Twitter says that this should never happen. However I was able to make it happen.
  * I caused this error by having the wrong callback URL. I sent a twitter url as 
  * parameter to the $this->Abraham->getRequestToken(  ); function.
+ * 
+ * Failed to validate oauth signature and token
+ * Many people say that it was their server clock's synchronization. Turned out to be
+ * the already authorized user tokens. So I deleted the application and created a new
+ * twitter application, then deleted all of the user tokens and this fixed the problem.
  * 
  * Sessions not saving.
  * In the cake core configurations file I noticed that the cake set session id had a
@@ -94,6 +98,7 @@ class TwitterloginController extends TwitterloginAppController
 	public $components = array(
 		'Security',
 		'Twitterlogin.Abraham',
+		'Twitterlogin.Twitterlogin',
 		'Session',
 		'Auth',
 	);
@@ -547,5 +552,35 @@ class TwitterloginController extends TwitterloginAppController
     {
     	
     }
+    
+    /**
+     * function is responsible for tweeting
+     *
+     * @return unknown
+     */
+    public function tweetit()
+    {
+    	//reasons to fail
+    	if (!isset($this->params['url']['tweet'])) return false;
+    	
+    	$tweet = twitter();
+    	$tweet->post('statuses/update', array('status' => $this->params['url']['tweet']));
+    	die();
+    }
+    
+    /**
+     * function is responsible for marking a tweet as favorited
+     *
+     * @return unknown
+     */
+    public function favorite()
+    {	
+    	//reasons to fail
+    	if (!isset($this->params['url']['id'])) return false;
+    	
+    	$tweet = twitter();
+    	$r = $tweet->createFavorite( $this->params['url']['id'] );
+    	die();
+    }
 }
-?>
+

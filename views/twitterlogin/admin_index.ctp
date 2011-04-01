@@ -29,7 +29,7 @@ $html->css('/twitterlogin/css/style.css', 'stylesheet', array('inline' => false)
 	<br/>
 	
 	<?php 
-	if (!twitter_connected() && $twitterlogin['Twitterlogin']['consumer_key'] && $twitterlogin['Twitterlogin']['consumer_secret']):
+	if (!twitter('profile.id',null,false) && $twitterlogin['Twitterlogin']['consumer_key'] && $twitterlogin['Twitterlogin']['consumer_secret']):
 		__('<p>Test it out. Merge your account!</p>'); 
 		twitter_login_button();
 	
@@ -37,11 +37,15 @@ $html->css('/twitterlogin/css/style.css', 'stylesheet', array('inline' => false)
 		$twitter = twitter();
 		?>
 		<h2>You're successfully connected to Twitter, LIVE!</h2>
-		<p><?php __("I've made this as simple as I can figure for most people. If you want the entire object back, simply use the following code. Otherwise use the examples below."); ?></p>
-		<code>
-			$twitter = twitter();
-		</code>
-		<p><?php __("You can ask twitter for any of the following data:"); ?></p>
+		<p><?php __("I've made this as simple as I can figure for most people. If you want the entire object back, simply use the following code."); ?></p>
+<code>$twitter = twitter();</code>
+		
+		<p><?php __("I've built in a seemless retweet option, here's how to retweet something from within your code."); ?></p>
+<code>$twitter = twitter();
+$twitter->post('statuses/update', array('status' => 'Just testing out my new retweeter plugin. http://www.jonathonbyrd.com'));
+</code>
+		
+		<p><?php __("Or, you can ask twitter for any of the following data:"); ?></p>
 		
 		<table style="width:100%">
 			<tr>
@@ -133,7 +137,7 @@ $html->css('/twitterlogin/css/style.css', 'stylesheet', array('inline' => false)
 	<?php endif; ?>
 	
 	
-	<?php echo $form->create(null, array('url' => array('plugin' => 'twitterlogin', 'controller' => 'twitterlogin', 'action' => 'update'))); ?>
+	<?php echo $form->create(null, array('url' => array('plugin' => 'twitterlogin', 'controller' => 'Twitterlogin', 'action' => 'update'))); ?>
 		<?php
 		echo $form->input('Twitterlogin.id', array(
 						'value' => 1,

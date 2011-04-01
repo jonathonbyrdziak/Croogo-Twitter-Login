@@ -19,6 +19,10 @@ App::import('Vendor', 'Twitterlogin.OAuth', array('file' => 'OAuth'.DS.'OAuth.ph
 App::import('Core', 'http_socket');
 uses('xml');
 
+if (!function_exists('twitterlogin_debug'))
+{
+	function twitterlogin_debug(){}
+}
 
 /**
  * Twitter OAuth class
@@ -162,6 +166,28 @@ class AbrahamComponent extends Object
 	}
 
 	/**
+	 * Favorites the status specified in the ID parameter as the authenticating user.
+	 * @param integer|string $id The ID of the status to favorite
+	 * @param string $format Return format
+	 * @return string
+	 */
+	function createFavorite($id) {
+		return $this->request("favorites/create/{$id}", array(), 'POST');
+	}
+
+
+	/**
+	 * Returns the 20 most recent favorite statuses for the authenticating user or user specified by the ID parameter in the requested format.
+	 * @param array $options Options to pass to the method
+	 * @param string $format Return format
+	 * @return string
+	 */
+	function getFavorites($options = array()) {
+		$options['screen_name'] = twitter('profile.screen_name',null,false);
+		return $this->request('favorites', $options, 'get');
+	}
+
+	/**
 	 * returns last status
 	 *
 	 * $twitter = twitter();
@@ -188,7 +214,7 @@ class AbrahamComponent extends Object
 	 * @param unknown_type $parameters
 	 * @return unknown
 	 */
-	function request($url, $parameters = array())
+	function request($url, $parameters = array(), $method = 'GET')
 	{
 		static $urls;
 		
@@ -199,7 +225,7 @@ class AbrahamComponent extends Object
 		
 		if ( !isset($urls[$url]) )
 		{
-			$urls[$url] = $this->oAuthRequest($url, 'GET', $parameters);
+			$urls[$url] = $this->oAuthRequest($url, $method, $parameters);
 			if ($this->format === 'json' && $this->decode_json)
 			{
 				$urls[$url] = json_decode($urls[$url]);
@@ -258,6 +284,9 @@ class AbrahamComponent extends Object
     	$this->admin_twitter_username = $twConfigs['twitter_username'];
     	$this->admin_twitter_password = $twConfigs['twitter_password'];
     	
+    	twitterlogin_debug( "Applications Consumer Key: $this->consumer_key");
+    	twitterlogin_debug( "Applications Consumer Secret Key: $this->consumer_secret");
+    	
     	$auth = $Session->read('Auth');
 		if ( isset($auth['User']['id']) ) // user is logged in, so automatically load accounts
 		{
@@ -284,6 +313,41 @@ class AbrahamComponent extends Object
 		$Abraham = $this;
 		
     	return $twConfigs;
+	}
+	
+	/**
+	 * Function is responsible for clearning the users tokens
+	 * 
+	 */
+	function clearUsersTokens()
+	{
+    	// loading resources
+    	$Twitterlogin = new Twitterlogin;
+    	$Twprofile = new Twprofile;
+    	$Session = new SessionComponent;
+    	
+    	$auth = $Session->read('Auth');
+		if ( isset($auth['User']['id']) ) // user is logged in, so automatically load accounts
+		{
+			$profile = $Twprofile->find('first',
+					array('conditions'=> 
+						array('Twprofile.croogo_id' => $auth['User']['id'])
+						));
+			
+			if ( $profile )
+			{
+				$profile['Twprofile']['oauth_token'] = '';
+				$profile['Twprofile']['oauth_token_secret'] = '';
+				$Twprofile->save( $profile );
+				
+				$this->authorized = false;
+			}
+		}
+		// Show notification if something went wrong.
+		$Session->setFlash(__('We had to clear your old tokens, please connect again.', true), 'default', array('class' => 'error'));
+		$loginPage = Router::url(array('plugin' => null, 'controller' => 'users', 'action' => 'login'), true);
+		header("Location: " . $loginPage);
+		break;
 	}
 	
 	/**
@@ -383,8 +447,18 @@ class AbrahamComponent extends Object
 			$parameters['oauth_callback'] = $oauth_callback;
 		} 
 		$request = $this->oAuthRequest($this->requestTokenURL(), 'GET', $parameters);
+		twitterlogin_debug("getRequestToken ", $request);
+		
+		if ($request == 'Failed to validate oauth signature and token')
+		{
+			$this->clearUsersTokens();
+		}
+		
 		$token = OAuthUtil::parse_parameters($request);
+		twitterlogin_debug("getRequestToken, oAuthUtil::parse_parameters ", $token);
+		
 		$this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
+		twitterlogin_debug("getRequestToken, OAuthConsumer ", $this->token);
 		return $token;
 	}
 
@@ -423,8 +497,14 @@ class AbrahamComponent extends Object
 			$parameters['oauth_verifier'] = $oauth_verifier;
 		}
 		$request = $this->oAuthRequest($this->accessTokenURL(), 'GET', $parameters);
+		twitterlogin_debug("getAccessToken; oAuthRequest results ", $request);
+		
 		$token = OAuthUtil::parse_parameters($request);
+		twitterlogin_debug("getAccessToken, oAuthUtil::parse_parameters ", $token);
+		
 		$this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
+		twitterlogin_debug("getAccessToken, OAuthConsumer ", $this->token);
+		
 		return $token;
 	}
 
@@ -445,8 +525,14 @@ class AbrahamComponent extends Object
 		$parameters['x_auth_password'] = $password;
 		$parameters['x_auth_mode'] = 'client_auth';
 		$request = $this->oAuthRequest($this->accessTokenURL(), 'POST', $parameters);
+		twitterlogin_debug("getXAuthToken, oAuthRequest ", $request);
+		
 		$token = OAuthUtil::parse_parameters($request);
+		twitterlogin_debug("getXAuthToken, OAuthUtil::parse_parameters ", $request);
+		
 		$this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
+		twitterlogin_debug("getXAuthToken, OAuthConsumer ", $this->token);
+		
 		return $token;
 	}
 
@@ -481,6 +567,8 @@ class AbrahamComponent extends Object
 		}
 		
 		$request = OAuthRequest::from_consumer_and_token($this->consumer, $this->token, $method, $url, $parameters);
+		twitterlogin_debug("oAuthRequest, OAuthRequest::from_consumer_and_token ", $this->token);
+		
 		$request->sign_request($this->sha1_method, $this->consumer, $this->token);
 		switch ($method)
 		{
@@ -525,6 +613,8 @@ class AbrahamComponent extends Object
 					$url = "{$url}?{$postfields}";
 				}
 		}
+		twitterlogin_debug("Abraham::http url ", $url);
+		twitterlogin_debug("Abraham::http postfields ", $postfields);
 	
 		curl_setopt($ci, CURLOPT_URL, $url);
 		$response = curl_exec($ci);

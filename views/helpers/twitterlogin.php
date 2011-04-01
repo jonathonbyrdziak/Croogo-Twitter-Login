@@ -29,7 +29,19 @@ class TwitterloginHelper extends AppHelper {
  *
  * @return void
  */
-    public function beforeRender() {
+    public function beforeRender() 
+    {
+    	if (isset($this->params['admin'])) return false;
+    	if (!twitter('profile.id',null,false)) return false;
+    	
+		//including stylesheets
+		$this->Html->css('/twitterlogin/css/style.css', 'stylesheet', array('inline' => false));
+    	echo $this->Html->scriptBlock("var twitterLogin = {
+    	tweetit: '".Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'tweetit'),true)."',
+    	favorite: '".Router::url(array('plugin' => null, 'controller' => 'twitterlogin', 'action' => 'favorite'),true)."',
+    	url: '".substr($u = Router::url('/',true), 0, strlen($u)-1)."',
+    	username: '".twitter('profile.screen_name', null, false)."',
+    	userid: '".twitter('profile.id', null, false)."'};");
     }
 /**
  * After render callback. Called after the view file is rendered
@@ -37,37 +49,48 @@ class TwitterloginHelper extends AppHelper {
  *
  * @return void
  */
-    public function afterRender() {
+    public function afterRender() 
+    {
+    	if (isset($this->params['admin'])) return false;
+    	if (!twitter('profile.id',null,false)) return false;
+    	
+    	echo $this->Html->script(array('/twitterlogin/js/twitterlogin.js','/twitterlogin/js/jquery-1.5.1.min.js','/twitterlogin/js/jquery-ui-1.8.11.custom.min.js'));
     }
 /**
  * Before layout callback. Called before the layout is rendered.
  *
  * @return void
  */
-    public function beforeLayout() {
+    public function beforeLayout() 
+    {
+    	
     }
 /**
  * After layout callback. Called after the layout has rendered.
  *
  * @return void
  */
-    public function afterLayout() {
+    public function afterLayout() 
+    {
+    	
     }
 /**
  * Called after LayoutHelper::setNode()
  *
  * @return void
  */
-    public function afterSetNode() {
+    public function afterSetNode() 
+    {
         // field values can be changed from hooks
-        $this->Layout->setNodeField('title', $this->Layout->node('title') . ' [Modified by TwitterloginHelper]');
+        //$this->Layout->setNodeField('title', $this->Layout->node('title') . ' [Modified by TwitterloginHelper]');
     }
 /**
  * Called before LayoutHelper::nodeInfo()
  *
  * @return string
  */
-    public function beforeNodeInfo() {
+    public function beforeNodeInfo() 
+    {
         //return '<p>beforeNodeInfo</p>';
     }
 /**
@@ -75,7 +98,8 @@ class TwitterloginHelper extends AppHelper {
  *
  * @return string
  */
-    public function afterNodeInfo() {
+    public function afterNodeInfo() 
+    {
         //return '<p>afterNodeInfo</p>';
     }
 /**
@@ -83,7 +107,8 @@ class TwitterloginHelper extends AppHelper {
  *
  * @return string
  */
-    public function beforeNodeBody() {
+    public function beforeNodeBody() 
+    {
         //return '<p>beforeNodeBody</p>';
     }
 /**
@@ -91,15 +116,61 @@ class TwitterloginHelper extends AppHelper {
  *
  * @return string
  */
-    public function afterNodeBody() {
-        //return '<p>afterNodeBody</p>';
+    public function afterNodeBody() 
+    {
+    	//reasons to fail
+    	if (!twitter('profile.id',null,false)) return false;
+    	
+    	//initializing variables
+    	static $favorites;
+    	$favored = 'needs-favored';
+    	$metas = array(
+    		'tweet_id' => false
+    	);
+    	foreach ((array)$this->Layout->node['Meta'] as $meta)
+    	{
+    		$metas[$meta['key']] = $meta['value'];
+    	}
+    	if (!isset($favorites))
+    	{
+    		$tweet = twitter();
+    		$favorites = $tweet->getFavorites();
+    		//this method requires authentication and I can't figure it out
+    		//print_r($favorites);
+    	}
+    	
+    	if (false) //just need to check to see if the item is favored already here
+    	{
+    		$favored = 'tweet-favored';
+    	}
+    	
+    	$html = 
+    	'<span class="tweet-actions '.$favored.'" tweet_id="'.$metas['tweet_id'].'" data="'.base64_encode( json_encode($this->Layout->node['Node']) ).'">';
+           
+    	if ($metas['tweet_id'])
+    	{
+    		$html .= '<a href="#" class="favorite-action" title="Favorite">
+            	<span><i></i><b>Favorite</b></span>
+            </a>';
+    	}
+    	
+		$html .= '<a href="#" class="reply-action" title="Reply">
+            	<span><i></i><b>Reply</b></span>
+            </a>
+            <a href="#" class="retweet-action" title="Retweet">
+            	<span><i></i><b>Retweet</b></span>
+            </a>
+    	</span>';
+		
+		return $html;
     }
 /**
  * Called before LayoutHelper::nodeMoreInfo()
  *
  * @return string
  */
-    public function beforeNodeMoreInfo() {
+    public function beforeNodeMoreInfo() 
+    {
         //return '<p>beforeNodeMoreInfo</p>';
     }
 /**
@@ -107,7 +178,8 @@ class TwitterloginHelper extends AppHelper {
  *
  * @return string
  */
-    public function afterNodeMoreInfo() {
+    public function afterNodeMoreInfo() 
+    {
         //return '<p>afterNodeMoreInfo</p>';
     }
 }

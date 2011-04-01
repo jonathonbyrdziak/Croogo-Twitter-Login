@@ -25,12 +25,12 @@ class TwitterloginComponent extends Object
     {
 		$controller->set('twitterloginComponent', 'TwitterloginComponent startup');
 	    
-		App::import('Component', 'Abraham');
-		if (class_exists('AbrahamComponent'))
-		{
+		App::import('Component', 'Twitterlogin.Abraham');
+		//if (class_exists('AbrahamComponent'))
+		//{
 			// loading resources
 			$Abraham = new AbrahamComponent;
-		}
+		//}
     }
     
 	/**
@@ -107,7 +107,7 @@ function twitter_login_button( $display_if_logged_in = true )
 	$auth = $Session->read('Auth');
 	
 	//reasons to fail
-	if (twitter_connected()) return false;
+	if (twitter('profile.id',null,false)) return false;
 	if (!$display_if_logged_in && isset($auth['User']['id'])) return false;
 	
 	// The same as require('controllers/users_controller.php');
@@ -130,7 +130,7 @@ function twitter_login_button( $display_if_logged_in = true )
  * @param unknown_type $echo
  * @return unknown
  */
-function &twitter( $variable = null, $user_id = null, $echo = true )
+function twitter( $variable = null, $user_id = null, $echo = true )
 {
 	// initializing variables
 	global $Abraham;
@@ -164,5 +164,85 @@ function twitter_connected()
 	if ( !$Abraham->authorized ) return false;
 	
 	return true;
+}
+
+/**
+ * Function is responsible for saving the debugging message
+ *
+ * @param unknown_type $message
+ * @return unknown
+ */
+if (!function_exists('twitterlogin_debug'))
+{
+	function twitterlogin_debug( $message )
+	{
+		//reasons to fail
+		if (!TWITTERLOGIN_DEBUG) return false;
+		if (!$message) return false;
+		
+		//initializing variables
+		global $twitterlogin_debugger;
+		if (!isset($twitterlogin_debugger))
+		{
+			$twitterlogin_debugger = array();
+		}
+		
+		$args = func_get_args();
+		unset($args[0]);
+		$all_string = '';
+		
+		foreach ((array)$args as $variable)
+		{
+			$string = "";
+			if (!is_string($variable))
+			{
+				ob_start();
+				echo  '<pre>';
+				print_r($variable);
+				echo  '</pre>';
+				$string = ob_get_clean();
+			}
+			elseif (is_bool($variable))
+			{
+				ob_start();
+				var_dump($variable);
+				$string = ob_get_clean();
+			}
+			else
+			{
+				$string = $variable;
+			}
+	
+			$all_string .= ' '.$string;
+		}
+		
+		$twitterlogin_debugger[] = $message.' : '.$all_string;
+	}
+}
+
+/**
+ * Function is responsible for printing out the debugging needs of this plugin
+ * To activate it, use the constant in the plugins configurations file. Be sure
+ * to also add your ip.
+ *
+ * @return null
+ */
+register_shutdown_function('twitterlogin_debugger');
+function twitterlogin_debugger()
+{
+	//initializing variables
+	global $twitterlogin_debugger;
+	
+	//reasons to fail
+	if (!TWITTERLOGIN_DEBUG) return false;
+	if (!is_array($twitterlogin_debugger)) return false;
+	if (TWITTERLOGIN_ADMINIP != $_SERVER['REMOTE_ADDR']) return false; //my ip
+	
+	echo '<div>';
+	foreach ((array)$twitterlogin_debugger as $log)
+	{
+		echo '<br>'.$log;
+	}
+	echo '</div>';
 }
 
